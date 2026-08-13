@@ -4,6 +4,7 @@
 
 - Clarified natural-language-first Agent operation.
 - Marked CLI commands as optional fallbacks for developers and standalone use.
+- Made the documented standalone test command work without package markers.
 
 ## 1.0.0 - 2026-08-13
 
