@@ -1,6 +1,6 @@
 # Image Compression Skill
 
-Version 1.0.3. MIT-licensed OpenClaw/Codex Agent Skill for reducing image file size with ImageMagick.
+Version 1.0.4. MIT-licensed OpenClaw/Codex Agent Skill for reducing image file size with ImageMagick.
 
 This project compresses the image file itself. It does not turn processed images into ZIP archives. ZIP is only a convenient way to distribute this repository.
 
@@ -30,17 +30,19 @@ The repository contains the Agent instructions and Python helper, but it does no
 ### Windows
 
 ```powershell
+winget install --id Python.Python.3.13 --exact --source winget --accept-source-agreements --accept-package-agreements
 winget install --id ImageMagick.ImageMagick --exact --source winget --accept-source-agreements --accept-package-agreements
-magick -version
 python --version
+magick -version
 ```
 
 ### macOS
 
 ```bash
+brew install python
 brew install imagemagick
-magick -version
 python3 --version
+magick -version
 ```
 
 ### Debian or Ubuntu
@@ -48,8 +50,8 @@ python3 --version
 ```bash
 sudo apt update
 sudo apt install imagemagick python3
-magick -version
 python3 --version
+magick -version
 ```
 
 ### Import as an Agent Skill
@@ -119,6 +121,8 @@ python image-compression/scripts/image_optimizer.py batch ./inputs --recursive -
 Recursive batch output preserves each source file's relative directory, so same-named files from different folders do not overwrite one another.
 
 If ImageMagick is not on PATH, pass its full path with `--magick`.
+
+If `python` or `magick` is not recognized immediately after installation, close and reopen the terminal so PATH changes are loaded. On Windows, if ImageMagick is installed but still unavailable as `magick`, use its full executable path, for example `C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\magick.exe`, with `--magick`. The Agent should verify the explicit path before processing.
 
 ## Format and quality policy
 
