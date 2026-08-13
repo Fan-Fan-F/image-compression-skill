@@ -62,7 +62,8 @@ def build_command(magick: str, source: Path, output: Path, fmt: str, quality: in
     return command
 
 
-def optimize_one(source: Path, output_dir: Path, args: argparse.Namespace, magick: str) -> dict:
+def optimize_one(source: Path, output_dir: Path, args: argparse.Namespace, magick: str,
+                 relative_to: Path | None = None) -> dict:
     if not source.is_file():
         raise FileNotFoundError(str(source))
     before = identify(magick, source)
@@ -73,8 +74,11 @@ def optimize_one(source: Path, output_dir: Path, args: argparse.Namespace, magic
             raise ValueError(f"Cannot preserve unsupported source format: {source.suffix}")
     if fmt == "jpg" and before["has_alpha"]:
         raise ValueError("JPEG output is unsafe for an image with transparency; choose WebP or PNG.")
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output = output_dir / (source.stem + (FORMATS[args.format] or source.suffix.lower()))
+    output_subdir = output_dir
+    if relative_to is not None:
+        output_subdir = output_dir / source.relative_to(relative_to).parent
+    output_subdir.mkdir(parents=True, exist_ok=True)
+    output = output_subdir / (source.stem + (FORMATS[args.format] or source.suffix.lower()))
     upper_limit = args.max_mb * 1024 * 1024 if args.max_mb else None
     lower_limit = args.min_mb * 1024 * 1024 if args.min_mb else None
     if lower_limit and upper_limit and lower_limit > upper_limit:
@@ -140,7 +144,8 @@ def main() -> int:
         results = []
         for source in sources:
             try:
-                results.append(optimize_one(source, args.output_dir, args, magick))
+                relative_to = args.input_dir if args.command == "batch" and args.recursive else None
+                results.append(optimize_one(source, args.output_dir, args, magick, relative_to))
             except Exception as exc:  # report per-file failures for batch jobs
                 results.append({"status": "error", "source": str(source), "error": str(exc)})
         manifest = args.output_dir / "manifest.json"
