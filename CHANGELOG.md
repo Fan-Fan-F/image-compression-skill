@@ -4,6 +4,11 @@
 
 - Fixed recursive batch output collisions by preserving relative directories.
 
+## 1.0.4 - 2026-08-13
+
+- Added official Python installation commands for Windows, macOS, and Debian/Ubuntu.
+- Clarified PATH refresh and explicit ImageMagick path handling.
+
 ## 1.0.3 - 2026-08-13
 
 - Added explicit dependency preflight for Python and ImageMagick.
