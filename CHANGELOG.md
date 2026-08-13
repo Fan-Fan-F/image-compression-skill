@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1 - 2026-08-13
+
+- Clarified natural-language-first Agent operation.
+- Marked CLI commands as optional fallbacks for developers and standalone use.
+
 ## 1.0.0 - 2026-08-13
 
 - Initial GitHub-ready release.
