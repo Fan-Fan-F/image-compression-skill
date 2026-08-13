@@ -1,6 +1,6 @@
 ---
 name: "image-compression"
-description: "Optimize large images for delivery and AI media workflows with ImageMagick, target-size search, batch processing, resizing, and verification."
+description: "自然语言驱动的 ImageMagick 图片压缩与 AI 媒体优化 Skill，支持格式保留、容量范围、批处理和验证。"
 ---
 
 # Image compression and AI media optimization
