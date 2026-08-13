@@ -50,6 +50,8 @@ Do not invent vendor-specific limits. If a platform is named, check its current 
 - Verify `magick -version` and fail clearly when ImageMagick is unavailable.
 - AVIF is optional: detect delegate support before using it; default to WebP when compatibility is uncertain.
 
+On Windows, Python can be installed from the official winget package `Python.Python.3.13`; on macOS use Homebrew's `python`; on Debian/Ubuntu use the distribution `python3` package. The Agent should distinguish an absent executable from a PATH that has not refreshed, and may use an explicitly supplied ImageMagick path after verifying it.
+
 ## Dependency preflight and installation
 
 Before processing any user image, verify:
