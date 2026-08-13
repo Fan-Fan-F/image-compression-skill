@@ -1,6 +1,6 @@
 # Image Compression Skill
 
-Version 1.0.2. MIT-licensed OpenClaw/Codex Agent Skill for reducing image file size with ImageMagick.
+Version 1.0.3. MIT-licensed OpenClaw/Codex Agent Skill for reducing image file size with ImageMagick.
 
 This project compresses the image file itself. It does not turn processed images into ZIP archives. ZIP is only a convenient way to distribute this repository.
 
@@ -22,6 +22,8 @@ This project compresses the image file itself. It does not turn processed images
 - AVIF requires an ImageMagick build with AVIF delegate support.
 
 Python uses only the standard library; Pillow is not required.
+
+The repository contains the Agent instructions and Python helper, but it does not bundle Python or ImageMagick. ImageMagick is a separate native application and must be installed on the user's machine. The Agent should check both dependencies before processing the first image and report the exact missing dependency instead of presenting a generic script error.
 
 ## Installation
 
@@ -53,6 +55,19 @@ python3 --version
 ### Import as an Agent Skill
 
 Copy the `image-compression/` directory into the target Agent's skills directory. The Agent should load `image-compression/SKILL.md` when asked to compress, convert, batch-optimize, inspect, or prepare images for AI upload or video input. The root README and release files are for repository users; `SKILL.md` is the Agent-facing contract.
+
+### Dependency preflight
+
+Before first use, check:
+
+```text
+Python 3.10+ available
+ImageMagick 7+ available as `magick`
+```
+
+If a dependency is missing, stop before touching user images. On Windows, offer the official `winget` installation; on macOS, Homebrew; on Debian/Ubuntu, apt. Installing software can require user approval, administrator privileges, a network connection, and a new terminal after PATH changes. The Agent must not claim the Skill is ready until `python --version` and `magick -version` both succeed.
+
+If ImageMagick is installed but not on PATH, allow the user to provide its full executable path with `--magick`. Do not download random binaries or third-party installers.
 
 ## Usage: natural language first
 
