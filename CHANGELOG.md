@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2 - 2026-08-13
+
+- Fixed recursive batch output collisions by preserving relative directories.
+
 ## 1.0.1 - 2026-08-13
 
 - Clarified natural-language-first Agent operation.
