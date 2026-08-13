@@ -1,6 +1,6 @@
 # Image Compression Skill
 
-Version 1.0.0. MIT-licensed OpenClaw/Codex Agent Skill for reducing image file size with ImageMagick.
+Version 1.0.1. MIT-licensed OpenClaw/Codex Agent Skill for reducing image file size with ImageMagick.
 
 This project compresses the image file itself. It does not turn processed images into ZIP archives. ZIP is only a convenient way to distribute this repository.
 
