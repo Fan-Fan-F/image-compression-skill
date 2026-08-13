@@ -54,7 +54,22 @@ python3 --version
 
 Copy the `image-compression/` directory into the target Agent's skills directory. The Agent should load `image-compression/SKILL.md` when asked to compress, convert, batch-optimize, inspect, or prepare images for AI upload or video input. The root README and release files are for repository users; `SKILL.md` is the Agent-facing contract.
 
-## Usage
+## Usage: natural language first
+
+When this repository is installed as an Agent Skill, users should not need to type Python commands. Describe the task naturally and let the Agent inspect the file, choose or confirm the format, run ImageMagick, validate the byte range, and report the output path.
+
+Examples:
+
+- "把桌面上的 123.png 压缩到 5MB 以内，保持 PNG 格式，不要删除原图。"
+- "把这张图片压缩到 4 到 5MB 之间，如果 PNG 做不到就先告诉我，不要擅自转格式。"
+- "把这张图转成高质量 WebP，控制在 5MB 以内，原图保留。"
+- "把这个文件夹里的图片批量优化成适合 AI 视频上传的文件，保持比例，不要裁切。"
+
+The Agent should ask only for a missing decision that materially affects the result, such as whether format conversion or resizing is allowed. It should execute the local helper automatically, preserve sources, and report format, dimensions, bytes, quality, manifest, and verification status.
+
+The commands below are optional fallbacks for developers, automation scripts, or users running the repository without an Agent.
+
+## CLI usage (optional)
 
 Inspect without creating an output:
 
