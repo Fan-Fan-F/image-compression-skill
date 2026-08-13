@@ -7,6 +7,19 @@ description: "Optimize large images for delivery and AI media workflows with Ima
 
 Use this skill when a user needs to reduce image size, prepare generated images for an AI image/video service, batch-optimize assets, preserve visual quality, or satisfy a hard byte limit.
 
+## Natural-language operation
+
+This is an Agent Skill, so the normal user interface is natural language, not a terminal. When the user asks to compress, optimize, convert, or prepare an image, resolve the referenced local file, inspect it, choose the appropriate command, execute the helper, and report the verified result. Do not ask the user to type the Python command unless they specifically request command-line instructions or are using the repository without an Agent.
+
+Examples of requests this skill should handle directly:
+
+- "把桌面上的 123.png 压缩到 5MB 以内，保持 PNG，不要删除原图。"
+- "把这张图压缩到 4 到 5MB，如果 PNG 无法达到就告诉我。"
+- "转成高质量 WebP，控制在 5MB 以下。"
+- "批量优化这个文件夹，准备给 AI 视频使用，保持比例，不要裁切。"
+
+Before execution, ask only about a materially missing choice: format conversion, resizing, or source replacement. Do not expose implementation details as a prerequisite for ordinary use.
+
 ## Scope and modes
 
 Choose one mode explicitly:
