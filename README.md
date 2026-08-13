@@ -1,6 +1,6 @@
 # Image Compression Skill
 
-Version 1.0.1. MIT-licensed OpenClaw/Codex Agent Skill for reducing image file size with ImageMagick.
+Version 1.0.2. MIT-licensed OpenClaw/Codex Agent Skill for reducing image file size with ImageMagick.
 
 This project compresses the image file itself. It does not turn processed images into ZIP archives. ZIP is only a convenient way to distribute this repository.
 
@@ -100,6 +100,8 @@ Batch process a directory recursively:
 ```bash
 python image-compression/scripts/image_optimizer.py batch ./inputs --recursive --format same --max-mb 10 --output-dir optimized
 ```
+
+Recursive batch output preserves each source file's relative directory, so same-named files from different folders do not overwrite one another.
 
 If ImageMagick is not on PATH, pass its full path with `--magick`.
 
