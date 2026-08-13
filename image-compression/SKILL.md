@@ -50,6 +50,17 @@ Do not invent vendor-specific limits. If a platform is named, check its current 
 - Verify `magick -version` and fail clearly when ImageMagick is unavailable.
 - AVIF is optional: detect delegate support before using it; default to WebP when compatibility is uncertain.
 
+## Dependency preflight and installation
+
+Before processing any user image, verify:
+
+1. Python 3.10 or newer is available.
+2. ImageMagick 7 or newer is available as `magick`, or the user has supplied an explicit executable path.
+
+The GitHub repository does not bundle Python or ImageMagick. If either dependency is missing, stop before touching files and explain which one is missing. Offer the platform-appropriate official package-manager command, but do not install software, request elevation, or access the network without the user's approval. After installation or a PATH change, verify `python --version` and `magick -version` again before proceeding.
+
+Use only official package-manager sources documented in the README. Do not download arbitrary binaries or tell the user that setup is complete based only on the presence of this Skill directory.
+
 ## Workflow
 
 1. **Inspect**: file existence, regular-file check, bytes, format, width/height, channels, alpha, colorspace, profiles, and format support.
