@@ -22,6 +22,11 @@ class OptimizerTests(unittest.TestCase):
         command = MODULE.build_command("magick", Path("in.png"), Path("out.webp"), "webp", 90, 2048, False)
         self.assertIn("2048x2048>", command)
 
+    def test_batch_output_preserves_recursive_relative_directory(self):
+        source = Path("inputs") / "nested" / "same.png"
+        output = Path("optimized") / source.relative_to(Path("inputs")).parent / "same.png"
+        self.assertEqual(output, Path("optimized") / "nested" / "same.png")
+
 
 if __name__ == "__main__":
     unittest.main()
