@@ -4,6 +4,12 @@
 
 - Fixed recursive batch output collisions by preserving relative directories.
 
+## 1.0.3 - 2026-08-13
+
+- Added explicit dependency preflight for Python and ImageMagick.
+- Documented that the repository does not bundle native software.
+- Added installation approval, PATH, privilege, and official-source guidance.
+
 ## 1.0.1 - 2026-08-13
 
 - Clarified natural-language-first Agent operation.
