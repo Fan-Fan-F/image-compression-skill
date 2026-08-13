@@ -122,7 +122,7 @@ The tool is local-only. It does not upload files, read API keys, delete source f
 From the repository root:
 
 ```bash
-python -m unittest discover -s image-compression/tests -v
+python image-compression/tests/test_optimizer.py
 python image-compression/scripts/image_optimizer.py --help
 python -m py_compile image-compression/scripts/image_optimizer.py image-compression/tests/test_optimizer.py
 ```
