@@ -1,0 +1,60 @@
+name: Image optimizer regression tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  images:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.10', '3.13']
+    env:
+      REQUIRE_IMAGEMAGICK: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Prepare pinned ImageMagick 7 on Linux
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          task_image_dir="$RUNNER_TEMP/imagemagick7"
+          mkdir -p "$task_image_dir"
+          cd "$task_image_dir"
+          curl --fail --location --retry 2 --output tool.AppImage \
+            https://github.com/ImageMagick/ImageMagick/releases/download/7.1.2-35/ImageMagick-7.1.2-35-gcc-x86_64.AppImage
+          echo 'f111044ed06b68cfb478df724c5a32d35145afa21073242f888d234a2f8cc002  tool.AppImage' | sha256sum --check -
+          chmod +x tool.AppImage
+          ./tool.AppImage --appimage-extract > extract.log
+          ./squashfs-root/AppRun -version
+          printf '%s\n' "IMAGEMAGICK_BINARY=$task_image_dir/squashfs-root/AppRun" >> "$GITHUB_ENV"
+      - name: Prepare pinned ImageMagick 7 on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $taskImageDir = Join-Path $env:RUNNER_TEMP 'imagemagick7'
+          New-Item -ItemType Directory -Path $taskImageDir -Force | Out-Null
+          $taskArchive = Join-Path $taskImageDir 'imagemagick.7z'
+          Invoke-WebRequest -Uri 'https://github.com/ImageMagick/ImageMagick/releases/download/7.1.2-35/ImageMagick-7.1.2-35-portable-Q16-HDRI-x64.7z' -OutFile $taskArchive
+          $taskDigest = (Get-FileHash -LiteralPath $taskArchive -Algorithm SHA256).Hash
+          if ($taskDigest -ne '34db4364da26c88d6b8cc5bbc1fff22b85d00d3b399c82fe85ee4790efacbbf1') { throw 'ImageMagick checksum mismatch' }
+          7z x $taskArchive "-o$taskImageDir" -y | Out-Null
+          if ($LASTEXITCODE -ne 0) { throw 'ImageMagick extraction failed' }
+          $taskBinaries = @(Get-ChildItem -LiteralPath $taskImageDir -Filter magick.exe -File -Recurse)
+          if ($taskBinaries.Count -ne 1) { throw 'Expected one ImageMagick executable' }
+          & $taskBinaries[0].FullName -version
+          if ($LASTEXITCODE -ne 0) { throw 'ImageMagick cannot run' }
+          Add-Content -LiteralPath $env:GITHUB_ENV -Value ('IMAGEMAGICK_BINARY=' + $taskBinaries[0].FullName)
+      - name: Run real synthetic image regressions
+        run: python image-compression/tests/test_optimizer.py

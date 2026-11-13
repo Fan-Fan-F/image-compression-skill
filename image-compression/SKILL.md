@@ -5,6 +5,8 @@ description: "自然语言驱动的 ImageMagick 图片压缩与 AI 媒体优化 
 
 # Image compression and AI media optimization
 
+Version 1.0.5.
+
 Use this skill when a user needs to reduce image size, prepare generated images for an AI image/video service, batch-optimize assets, preserve visual quality, or satisfy a hard byte limit.
 
 ## Natural-language operation
@@ -18,7 +20,7 @@ Examples of requests this skill should handle directly:
 - "转成高质量 WebP，控制在 5MB 以下。"
 - "批量优化这个文件夹，准备给 AI 视频使用，保持比例，不要裁切。"
 
-Before execution, ask only about a materially missing choice: format conversion, resizing, or source replacement. Do not expose implementation details as a prerequisite for ordinary use.
+Before execution, ask only about a materially missing choice such as format conversion or resizing. The helper never replaces source images, even with `--overwrite`. Do not expose implementation details as a prerequisite for ordinary use.
 
 ## Scope and modes
 
@@ -34,8 +36,8 @@ Do not invent vendor-specific limits. If a platform is named, check its current 
 ## Safety defaults
 
 - Inspect every input before encoding. Resolve exact paths, including repeated spaces and parentheses.
-- Never overwrite source files by default. Use a dedicated output directory and preserve base names.
-- If replacement is explicitly requested, move originals to a recoverable backup before replacing. Permanently delete only after a separate explicit confirmation.
+- Never replace source images, including hard-link or symlink aliases. Use a dedicated output directory. An explicit `--overwrite` only permits atomic replacement of previous non-source delivery files and manifests after successful verification; otherwise use a new output directory.
+- Generate candidates in temporary directories on the output filesystem. Publish only after format, dimensions, transparency and byte-range checks pass; clean failed candidates and retain previous output files. Publication is per file, so a batch can contain successful outputs alongside reported failures.
 - Never upload files or expose API keys. This skill is local-only.
 - Treat `--max-mb` as a hard upper bound in bytes; leave headroom by default.
 - Preserve pixel dimensions unless resizing is explicitly requested or the selected AI-video profile requires it. Report every dimension change.
@@ -65,7 +67,7 @@ Use only official package-manager sources documented in the README. Do not downl
 
 ## Workflow
 
-1. **Inspect**: file existence, regular-file check, bytes, format, width/height, channels, alpha, colorspace, profiles, and format support.
+1. **Inspect**: file existence, regular-file check, bytes, format, width/height, channels, explicit alpha trait and opacity, colorspace, profiles, and format support. `has_alpha` indicates a channel trait; `is_opaque` indicates actual full opacity and determines JPEG safety. Opaque gray/RGB/RGBA can use JPEG; actual transparent pixels cannot. Unknown opacity and multi-frame images are rejected safely rather than discarding data or producing untracked frames.
 2. **Select format**:
    - alpha/transparency or exact pixels: PNG lossless or WebP lossless; warn if the size limit is impossible without resizing or palette reduction;
    - opaque rendered artwork or photos: WebP lossy by default;
@@ -74,9 +76,11 @@ Use only official package-manager sources documented in the README. Do not downl
 3. **Select dimensions**: keep source dimensions by default. For `ai-video`, use a user-approved `--max-dimension`; never silently crop or change aspect ratio. A resize preserves aspect ratio and uses a high-quality Lanczos filter.
 4. **Encode**: start at high quality (WebP 92, JPEG 92), strip metadata only when accepted, and use WebP method 6.
 5. **Search**: use `--format same` when the output must remain PNG/JPEG/WebP, or select WebP/JPEG/AVIF explicitly. If a hard target is supplied, test quality values from high to low and select the highest result inside the requested `--min-mb` and `--max-mb` range. For lossless PNG, the range may be impossible without resizing or color reduction; report that instead of adding artificial padding or silently changing pixels.
-6. **Batch**: process all matching images, continue after individual failures, and record success/failure for each file.
-7. **Verify**: check exact output bytes, dimensions, format, alpha, and readable identify output. Generate a JSON manifest with source/output, bytes, savings, quality, dimensions, mode, and metadata policy.
+6. **Batch**: pre-plan every output, preserve recursive relative directories, and exclude the output subtree from recursive input. Reject output equal to the input directory or any planned source alias. Only conversion collision groups gain the original extension (`foo.png.webp`, `foo.jpg.webp`); unrelated names remain unchanged. If a third input still makes the final names ambiguous, stop before encoding and resolve that input naming issue. Process valid plans, continue after individual failures, and record success/failure for each file without duplicate success output paths.
+7. **Verify**: check exact output bytes, dimensions, format, alpha/opacity, and readable identify output before publishing. Generate a JSON manifest with source/output, bytes, savings, quality, dimensions, mode, and metadata policy. Existing images and manifests require explicit replacement authorization through `--overwrite`; this flag never bypasses source protection.
 8. **Report**: list found/missing/failed files and exact output paths. Never claim completion before verification.
+
+If the helper exits with status 1 and returns `status: "partial"`, `manifest: null`, `manifest_error` and `results`, manifest generation/publication failed after processing. Report the actual completed files and per-file errors from that JSON. Images already successfully published are not rolled back; explicit overwrite may therefore have replaced earlier delivery copies. An old manifest can remain and describe an earlier run, so never present it as this run's success record. Resolve the report write/lock error before treating the delivery report as complete, and do not blindly repeat the entire batch.
 
 ## Format guidance
 
